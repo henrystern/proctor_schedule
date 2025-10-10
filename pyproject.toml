@@ -1,0 +1,43 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "proctor_schedule"
+version = "0.1.0"
+description = "Convert the proctor schedule excel sheet into importable calendar events."
+authors = [
+    { name = "Henry Stern"},
+]
+license = { file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.13, <4"
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+extend-select = [
+    "W",                   # Whitespace
+    "N",                   # Naming
+    "A",                   # Overshadowing builtins
+    "ISC",                 # Implicit string concatenation
+    "PTH",                 # Require pathlib instead of os
+    "D"                    # Require docstrings
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"__init__.py" = ["D104"] # Don't require docstring in __init__
+
+[tool.ruff.lint.isort]
+known-first-party = ["proctor_schedule"]
+force-sort-within-sections = true
+
+[tool.pyright]
+typeCheckingMode = "standard"
+include = ["src"]
+ignore = ["\\Interactive-*.interactive.py"]
+reportMissingParameterType = true
