@@ -76,3 +76,7 @@ release: all
 		--prerelease \
 		raw_data.zip
 	@rm -f raw_data.zip
+
+schedules: env
+	@echo "Running python script..."
+	@python src/proctor_schedule/make_calendar.py

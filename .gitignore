@@ -9,3 +9,5 @@ archive/
 logs/**/*.log
 
 data/**/*.parquet
+data/**/*.ics
+data/raw/*.xlsx
