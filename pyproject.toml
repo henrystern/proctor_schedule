@@ -12,6 +12,15 @@ authors = [
 license = { file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.13, <4"
+dependencies = [
+    "fastexcel>=0.16.0",
+    "icalendar>=6.3.1",
+    "loguru>=0.7.3",
+    "pandas[performance]>=2.3.3",
+    "plotly[kaleido]>=6.3.1",
+    "polars[pyarrow]>=1.34.0",
+    "tqdm>=4.67.1",
+]
 
 [tool.ruff]
 line-length = 79
@@ -41,3 +50,9 @@ typeCheckingMode = "standard"
 include = ["src"]
 ignore = ["\\Interactive-*.interactive.py"]
 reportMissingParameterType = true
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.1",
+    "nbformat>=5.10.4",
+]
