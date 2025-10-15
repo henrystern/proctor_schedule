@@ -13,13 +13,9 @@ license = { file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.13, <4"
 dependencies = [
-    "fastexcel>=0.16.0",
     "icalendar>=6.3.1",
     "loguru>=0.7.3",
-    "pandas[performance]>=2.3.3",
-    "plotly[kaleido]>=6.3.1",
-    "polars[pyarrow]>=1.34.0",
-    "tqdm>=4.67.1",
+    "polars[calamine,pyarrow]>=1.34.0",
 ]
 
 [tool.ruff]
