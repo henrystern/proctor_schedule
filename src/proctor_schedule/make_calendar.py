@@ -37,6 +37,8 @@ def main(schedule_file: Path, start_offset_mins: int):
         pl.col("Date").min().dt.strftime("%Y-%m")
     ).item()
 
+    check_for_double_bookings(sched)
+
     cal = Calendar()
     [cal.add_component(e) for e in sched["Event"]]
     with (INTERIM_DATA_DIR / f"{schedule_period}_proctoring.ics").open(
@@ -109,6 +111,31 @@ def create_events(sched: pl.DataFrame):
     return events
 
 
+def check_for_double_bookings(sched: pl.DataFrame):
+    """Check if any proctors are double booked in the schedule."""
+    appointments = sched.explode("Proctor")
+    double_bookings = appointments.join_where(
+        appointments,
+        # The same proctor is assigned an appointment that:
+        pl.col("Proctor") == pl.col("Proctor_right"),
+        # Starts before another appointment starts
+        (pl.col("Start time") < pl.col("Start time_right")),
+        # Ends after that other appointment starts
+        (pl.col("End time") > pl.col("Start time_right")),
+        # and is not for the same location
+        pl.col("Location") != pl.col("Location_right"),
+    )
+
+    for row in double_bookings.iter_rows(named=True):
+        logger.warning(
+            f"""
+            {row["Proctor"]} is double-booked on {row["Date"]}:
+                {row["Course"]}-{row["Section"]}: assigned from {row["Start time"].time()} to {row["End time"].time()}.
+                {row["Course_right"]}-{row["Section_right"]}: assigned from {row["Start time_right"].time()} to {row["End time_right"].time()}.
+            """
+        )
+
+
 def prompt_for_file(files: List[str]):
     """Prompt the user to select from a list of options."""
     print("Select a file to convert to ICS:")
@@ -142,7 +169,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--start-offset",
         help="How many minutes to subtract from the start of the exam for the event start.",
-        default=15,
+        default=30,
     )
     parsed_args = parser.parse_args()
     if parsed_args.schedule:
