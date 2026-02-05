@@ -18,7 +18,7 @@ ARCHIVE_DIR := ./archive/$(CURRENT_DATE)
 	env format lint \
 	clean clean-output clean-pycache archive
 
-all: env
+all: env data/interim/building_abbreviations.csv
 
 env:
 	@echo "Syncing virtual environment with uv..."
@@ -76,6 +76,10 @@ release: all
 		--prerelease \
 		raw_data.zip
 	@rm -f raw_data.zip
+
+data/interim/building_abbreviations.csv: src/proctor_schedule/get_building_abbreviations.py data/raw/building_abbreviations_index.htm
+	@echo "Parsing building names from abbreviations."
+	@python $<
 
 schedules: env
 	@echo "Running python script..."

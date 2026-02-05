@@ -13,6 +13,7 @@ license = { file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.13, <4"
 dependencies = [
+    "beautifulsoup4>=4.14.3", # For expanding building abbreviations
     "icalendar>=6.3.1",
     "loguru>=0.7.3",
     "polars[calamine,pyarrow]>=1.34.0",

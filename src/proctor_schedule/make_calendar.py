@@ -93,14 +93,24 @@ def clean_proctor_schedule(sched: pl.DataFrame):
 
 def create_events(sched: pl.DataFrame):
     """Create a list of icalendar events from the cleaned dataframe of event information."""
+    abbreviations = (
+        pl.read_csv(INTERIM_DATA_DIR / "building_abbreviations.csv")
+        .with_columns(pl.concat_str("Building", pl.lit(": "), "Address"))
+        .sort(pl.col("Abbreviation").str.len_chars(), descending=True)
+    )
     events = []
     for row in sched.iter_rows(named=True):
+        building = row["Location"].split("-")[0]
+        for abbrv_row in abbreviations.iter_rows(named=True):
+            building = building.replace(
+                abbrv_row["Abbreviation"], abbrv_row["Building"]
+            )
         event = Event()
         event.add("uid", str(uuid4()))
         event.add("summary", "Proctoring")
         event.add(
             "description",
-            f"{row['Subject']} {row['Course']}-{row['Section']} for {row['Instructor']}, {row['Students enrolled']} students\nProctors: {', '.join(row['Proctor'])}"
+            f"{row['Subject']} {row['Course']}-{row['Section']} for {row['Instructor']}, {row['Students enrolled']} students\nProctors: {', '.join(row['Proctor'])}\nBuilding: {building}"
             if row["Subject"] != "Make-up Exam"
             else f"Make-up exam\nProctors: {', '.join(row['Proctor'])}",
         )
