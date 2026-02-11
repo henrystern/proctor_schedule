@@ -2,7 +2,9 @@
 
 import argparse
 from pathlib import Path
+import textwrap
 from typing import List
+from urllib import parse
 from uuid import uuid4
 
 from icalendar import Calendar, Event
@@ -104,13 +106,18 @@ def create_events(sched: pl.DataFrame):
         for abbrv_row in abbreviations.iter_rows(named=True):
             building = building.replace(
                 abbrv_row["Abbreviation"], abbrv_row["Building"]
-            )
+            ).replace(":", ",")
         event = Event()
         event.add("uid", str(uuid4()))
         event.add("summary", "Proctoring")
         event.add(
             "description",
-            f"{row['Subject']} {row['Course']}-{row['Section']} for {row['Instructor']}, {row['Students enrolled']} students\nProctors: {', '.join(row['Proctor'])}\nBuilding: {building}"
+            textwrap.dedent(f"""\
+            {row["Subject"]} {row["Course"]}-{row["Section"]} for {row["Instructor"]}, {row["Students enrolled"]} students
+            Proctors: {", ".join(row["Proctor"])}
+            Building: {building}
+            Directions: https://www.google.com/maps/dir//{parse.quote(building)}
+            """)
             if row["Subject"] != "Make-up Exam"
             else f"Make-up exam\nProctors: {', '.join(row['Proctor'])}",
         )
