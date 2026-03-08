@@ -3,7 +3,6 @@
 import argparse
 from pathlib import Path
 import textwrap
-from typing import List
 from urllib import parse
 from uuid import uuid4
 
@@ -18,6 +17,7 @@ from proctor_schedule.config import (
     PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
 )
+from proctor_schedule.user_input import prompt_for_file
 
 
 def main(schedule_file: Path, start_offset_mins: int):
@@ -151,23 +151,6 @@ def check_for_double_bookings(sched: pl.DataFrame):
                 {row["Course_right"]}-{row["Section_right"]}: assigned from {row["Start time_right"].time()} to {row["End time_right"].time()}.
             """
         )
-
-
-def prompt_for_file(files: List[str]):
-    """Prompt the user to select from a list of options."""
-    print("Select a file to convert to ICS:")
-    for i, file in enumerate(files):
-        print(f"{i + 1}. {file}")
-
-    while True:
-        try:
-            choice = int(input("Enter the number of the file: "))
-            if 1 <= choice <= len(files):
-                return files[choice - 1]
-            else:
-                print("Invalid number. Try again.")
-        except ValueError:
-            print("Please enter a valid number.")
 
 
 if __name__ == "__main__":
