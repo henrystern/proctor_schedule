@@ -1,12 +1,13 @@
 """Create an ICS calendar from an excel proctoring schedule."""
 
 import argparse
+from datetime import timedelta
 from pathlib import Path
 import textwrap
 from urllib import parse
 from uuid import uuid4
 
-from icalendar import Calendar, Event
+from icalendar import Alarm, Calendar, Event
 from loguru import logger
 import polars as pl
 import polars.selectors as cs
@@ -124,6 +125,11 @@ def create_events(sched: pl.DataFrame):
         event.add("location", row["Location"])
         event.add("dtstart", row["Start time"])
         event.add("dtend", row["End time"])
+        alarm_1h_before = Alarm()
+        alarm_1h_before.add("action", "DISPLAY")
+        alarm_1h_before.add("trigger", timedelta(hours=-1))
+        alarm_1h_before.add("description", "Reminder: Proctoring in 1 hour")
+        event.add_component(alarm_1h_before)
         events.append(event)
     return events
 
